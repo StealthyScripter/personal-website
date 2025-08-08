@@ -18,7 +18,7 @@ export default function Contact() {
           <div className="contact-methods">
             <div className="contact-method">
               <div className="contact-icon"></div>
-              <span>brian@wendot.com</span>
+              <span>koringo.w.brian@gmail.com</span>
             </div>
             <div className="contact-method">
               <div className="contact-icon"></div>

@@ -1,5 +1,6 @@
 'use client'
 import React, { useRef, useEffect, useState, useCallback } from 'react';
+import { skillsData } from '@/services/FetchData';
 
 interface Skill {
   name: string;
@@ -22,32 +23,6 @@ interface Skill {
 interface SkillsProps {
   className?: string;
 }
-
-const skillsData = [
-  // Frontend Skills
-  { name: "React", category: "frontend" as const },
-  { name: "Vue.js", category: "frontend" as const },
-  { name: "TypeScript", category: "frontend" as const },
-  { name: "Next.js", category: "frontend" as const },
-  { name: "Tailwind CSS", category: "frontend" as const },
-  { name: "Three.js", category: "frontend" as const },
-  
-  // Backend Skills
-  { name: "Node.js", category: "backend" as const },
-  { name: "Python", category: "backend" as const },
-  { name: "Express", category: "backend" as const },
-  { name: "Django", category: "backend" as const },
-  { name: "PostgreSQL", category: "backend" as const },
-  { name: "MongoDB", category: "backend" as const },
-  
-  // DevOps Skills
-  { name: "Docker", category: "devops" as const },
-  { name: "AWS", category: "devops" as const },
-  { name: "Git", category: "devops" as const },
-  { name: "CI/CD", category: "devops" as const },
-  { name: "Kubernetes", category: "devops" as const },
-  { name: "Vercel", category: "devops" as const },
-];
 
 const categoryColors = {
   frontend: { 
@@ -135,7 +110,7 @@ export default function Skills({ className = '' }: SkillsProps) {
       skill.vx += oscillationX * 0.001;
       skill.vy += oscillationY * 0.001;
 
-      // Mouse proximity detection for expansion (no movement)
+      // Mouse proximity detection for expansion
       if (mouse.isActive) {
         const dx = mouse.x - skill.x;
         const dy = mouse.y - skill.y;

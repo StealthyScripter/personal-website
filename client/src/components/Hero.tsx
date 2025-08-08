@@ -2,7 +2,7 @@ export default function Hero() {
   return (
     <section id="home" className="hero">
       <div className="hero-content">
-        <div className="hero-subtitle">Software Developer & Digital Craftsman</div>
+        <div className="hero-subtitle">Software & Web Developer</div>
         <h1 className="hero-title">Brian Wendot</h1>
         <p className="hero-description">
           Creating exceptional digital experiences through clean code, innovative solutions, and user-centered design

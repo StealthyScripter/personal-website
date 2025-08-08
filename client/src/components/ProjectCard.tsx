@@ -12,8 +12,8 @@ export default function ProjectCard({
   description, 
   image, 
   technologies, 
-  demoLink = "#", 
-  githubLink = "#" 
+  demoLink, 
+  githubLink 
 }: ProjectCardProps) {
   return (
     <div className="project-card">
@@ -27,8 +27,23 @@ export default function ProjectCard({
           ))}
         </div>
         <div className="project-links">
-          <a href={demoLink} className="project-link">Live Demo</a>
-          <a href={githubLink} className="project-link">GitHub</a>
+          <a 
+            href={demoLink || undefined}
+            className={`project-link ${!demoLink ? "disabled" : ""}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-disabled={!demoLink}
+            >Live Demo
+          </a>
+          <a
+            href={githubLink || undefined}
+            className={`project-link ${!githubLink ? "disabled" : ""}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-disabled={!githubLink}
+          >
+            GitHub
+          </a>
         </div>
       </div>
     </div>

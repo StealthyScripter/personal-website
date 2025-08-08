@@ -4,19 +4,19 @@ export default function ContactForm() {
       <form>
         <div className="form-group">
           <label htmlFor="name">Name</label>
-          <input type="text" id="name" name="name" required />
+          <input type="text" id="name" name="name" placeholder="e.g John Doe"required />
         </div>
         <div className="form-group">
           <label htmlFor="email">Email</label>
-          <input type="email" id="email" name="email" required />
+          <input type="email" id="email" name="email" placeholder="e.g john.doe@email.com" required />
         </div>
         <div className="form-group">
-          <label htmlFor="project">Project Type</label>
+          <label htmlFor="project">Subject</label>
           <input 
             type="text" 
             id="project" 
             name="project" 
-            placeholder="Web App, Mobile App, Consultation..." 
+            placeholder="Subject..." 
           />
         </div>
         <div className="form-group">
@@ -24,7 +24,7 @@ export default function ContactForm() {
           <textarea 
             id="message" 
             name="message" 
-            placeholder="Tell me about your project..." 
+            placeholder="message..." 
             required
           ></textarea>
         </div>

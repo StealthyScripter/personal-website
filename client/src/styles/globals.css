@@ -544,6 +544,11 @@ section {
   color: var(--accent-color);
 }
 
+.project-link.disabled {
+  pointer-events: none;
+  opacity: 0.5;
+  cursor: not-allowed;
+}
 /* ===========================================
    CONTACT SECTION
 =========================================== */
@@ -651,17 +656,18 @@ footer {
 }
 
 .social-link {
-  width: 40px;
-  height: 40px;
-  background: var(--card-bg);
-  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
+  border: 1px solid rgba(0, 245, 255, 0.1);
+  padding: 10px 24px;
+  height: 40px;
+  border-radius: 30%;
+  background: var(--card-bg);
   color: var(--text-secondary);
   text-decoration: none;
   transition: all var(--transition-normal);
-  border: 1px solid rgba(0, 245, 255, 0.1);
+  cursor:pointer;
 }
 
 .social-link:hover {

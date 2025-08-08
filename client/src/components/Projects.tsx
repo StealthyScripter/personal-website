@@ -1,25 +1,5 @@
 import ProjectCard from './ProjectCard';
-
-const projectsData = [
-  {
-    title: "Next-Gen E-Commerce Platform",
-    description: "A full-stack e-commerce solution with real-time inventory management, AI-powered recommendations, and seamless payment integration.",
-    image: "E-Commerce Platform",
-    technologies: ["React", "Node.js", "PostgreSQL", "Stripe"]
-  },
-  {
-    title: "AI Analytics Dashboard", 
-    description: "Interactive dashboard for data visualization with machine learning insights, real-time analytics, and predictive modeling capabilities.",
-    image: "AI Dashboard",
-    technologies: ["Vue.js", "Python", "TensorFlow", "D3.js"]
-  },
-  {
-    title: "Social Collaboration Tool",
-    description: "Cross-platform mobile application for team collaboration with real-time messaging, file sharing, and project management features.",
-    image: "Mobile App", 
-    technologies: ["React Native", "Firebase", "TypeScript", "Socket.io"]
-  }
-];
+import { projectsData } from '@/services/FetchData';
 
 export default function Projects() {
   return (
@@ -36,6 +16,8 @@ export default function Projects() {
             description={project.description}
             image={project.image}
             technologies={project.technologies}
+            demoLink={project.demoLink}
+            githubLink={project.githubLink}
           />
         ))}
       </div>
