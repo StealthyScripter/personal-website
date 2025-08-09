@@ -1,16 +1,16 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import Script from "next/script"; // ✅ import Script
+import { Inter, JetBrains_Mono } from "next/font/google";
+import Script from "next/script";
 import "../styles/globals.css";
 import "../styles/index.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const jetbrainsMono = JetBrains_Mono({
+  variable: "--font-jetbrains-mono",
   subsets: ["latin"],
 });
 
@@ -52,7 +52,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        {/* ✅ Load Google Analytics script */}
+        {/* Load Google Analytics script */}
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-S6CX32X971"
           strategy="afterInteractive"
@@ -67,7 +67,7 @@ export default function RootLayout({
         </Script>
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${inter.variable} ${jetbrainsMono.variable} antialiased`}
       >
         {children}
       </body>
