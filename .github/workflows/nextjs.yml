@@ -1,4 +1,4 @@
-# Deploy Next.js site to GitHub Pages from client folder
+# Deploy Next.js site to GitHub Pages
 name: Deploy Next.js site to Pages
 
 on:
@@ -25,12 +25,12 @@ jobs:
       - name: Detect package manager
         id: detect-package-manager
         run: |
-          if [ -f "${{ github.workspace }}/client/yarn.lock" ]; then
+          if [ -f "${{ github.workspace }}/personal-website-v2/yarn.lock" ]; then
             echo "manager=yarn" >> $GITHUB_OUTPUT
             echo "command=install" >> $GITHUB_OUTPUT
             echo "runner=yarn" >> $GITHUB_OUTPUT
             exit 0
-          elif [ -f "${{ github.workspace }}/client/package.json" ]; then
+          elif [ -f "${{ github.workspace }}/personal-website-v2/package.json" ]; then
             echo "manager=npm" >> $GITHUB_OUTPUT
             echo "command=ci" >> $GITHUB_OUTPUT
             echo "runner=npx --no-install" >> $GITHUB_OUTPUT
@@ -45,7 +45,7 @@ jobs:
         with:
           node-version: "20"
           cache: ${{ steps.detect-package-manager.outputs.manager }}
-          cache-dependency-path: client/package-lock.json
+          cache-dependency-path: personal-website-v2/package-lock.json
           
       - name: Setup Pages
         uses: actions/configure-pages@v5
@@ -56,23 +56,23 @@ jobs:
         uses: actions/cache@v4
         with:
           path: |
-            client/.next/cache
-          key: ${{ runner.os }}-nextjs-${{ hashFiles('client/**/package-lock.json', 'client/**/yarn.lock') }}-${{ hashFiles('client/**.[jt]s', 'client/**.[jt]sx') }}
+            personal-website-v2/.next/cache
+          key: ${{ runner.os }}-nextjs-${{ hashFiles('personal-website-v2/**/package-lock.json', 'personal-website-v2/**/yarn.lock') }}-${{ hashFiles('personal-website-v2/**.[jt]s', 'personal-website-v2/**.[jt]sx') }}
           restore-keys: |
-            ${{ runner.os }}-nextjs-${{ hashFiles('client/**/package-lock.json', 'client/**/yarn.lock') }}-
+            ${{ runner.os }}-nextjs-${{ hashFiles('personal-website-v2/**/package-lock.json', 'personal-website-v2/**/yarn.lock') }}-
             
       - name: Install dependencies
         run: ${{ steps.detect-package-manager.outputs.manager }} ${{ steps.detect-package-manager.outputs.command }}
-        working-directory: ./client
+        working-directory: ./personal-website-v2
         
       - name: Build with Next.js
         run: ${{ steps.detect-package-manager.outputs.runner }} next build
-        working-directory: ./client
+        working-directory: ./personal-website-v2
         
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./client/out
+          path: ./personal-website-v2/out
 
   deploy:
     environment:
