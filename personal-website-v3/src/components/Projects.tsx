@@ -1,10 +1,15 @@
+'use client'
 import ProjectCard from './ProjectCard';
 import { projectsData } from '@/services/FetchData';
+import { useReveal } from '@/hooks/useReveal';
 
 export default function Projects() {
+  const sectionRef = useReveal();
+
   return (
-    <section id="projects">
-      <h2 className="section-title">Featured Projects</h2>
+    <section id="projects" ref={sectionRef as React.RefObject<HTMLElement>} className="reveal">
+      <div className="section-label">Portfolio</div>
+      <h2 className="section-title">Featured <span className="accent">Projects</span></h2>
       <p className="section-subtitle">
         A showcase of innovative solutions and creative implementations
       </p>

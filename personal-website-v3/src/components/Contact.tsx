@@ -1,19 +1,24 @@
+'use client'
 import ContactForm from './ContactForm';
+import { useReveal } from '@/hooks/useReveal';
 
 export default function Contact() {
+  const sectionRef = useReveal();
+
   return (
-    <section id="contact">
-      <h2 className="section-title">Let&#39;s Build Something Amazing</h2>
+    <section id="contact" ref={sectionRef as React.RefObject<HTMLElement>} className="reveal">
+      <div className="section-label">Contact</div>
+      <h2 className="section-title">Let&apos;s Build Something <span className="accent">Amazing</span></h2>
       <p className="section-subtitle">
-        Ready to bring your ideas to life? Let&#39;s discuss your next project
+        Ready to bring your ideas to life? Let&apos;s discuss your next project
       </p>
       <div className="contact-content">
         <div className="contact-info">
           <h3>Get In Touch</h3>
           <p>
-            I&#39;m always open to discussing new opportunities, creative projects, 
-            and innovative solutions. Whether you&#39;re a startup or an established company, 
-            let&#39;s explore how we can work together.
+            I&apos;m always open to discussing new opportunities, creative projects,
+            and innovative solutions. Whether you&apos;re a startup or an established company,
+            let&apos;s explore how we can work together.
           </p>
           <div className="contact-methods">
             <div className="contact-method">
@@ -46,7 +51,17 @@ export default function Contact() {
             </div>
           </div>
         </div>
-        <ContactForm />
+        <div className="terminal-form">
+          <div className="terminal-header">
+            <span className="console-dot red"></span>
+            <span className="console-dot yellow"></span>
+            <span className="console-dot green"></span>
+            <span className="terminal-title">contact --send-message</span>
+          </div>
+          <div className="terminal-body">
+            <ContactForm />
+          </div>
+        </div>
       </div>
     </section>
   );
