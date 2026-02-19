@@ -11,17 +11,18 @@ import AnimatedBackground from '@/components/AnimatedBackground';
 export default function Home() {
   return (
     <>
-      <div>
-        <AnimatedBackground />
-        <Navigation />
+      <div className="noise-overlay" aria-hidden="true"></div>
+      <AnimatedBackground />
+      <Navigation />
+      <main>
         <Hero />
         <About />
         <Skills />
         <Experience />
         <Projects />
         <Contact />
-        <Footer />
-      </div>
+      </main>
+      <Footer />
     </>
   );
 }
