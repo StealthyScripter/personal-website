@@ -1,6 +1,8 @@
 import { socialLinks } from "@/services/FetchData";
 
 export default function Footer() {
+  const currentYear = new Date().getFullYear();
+  
   return (
     <footer>
       <div className="social-links">
@@ -17,7 +19,7 @@ export default function Footer() {
       ))}
       </div>
       <p style={{ color: "var(--text-secondary)" }}>
-        © 2025 Brian Wendot. Crafted with passion and precision.
+        &copy; {currentYear} Brian Wendot. Crafted with passion and precision.
       </p>
     </footer>
   );
