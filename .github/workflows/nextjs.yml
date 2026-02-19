@@ -19,7 +19,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Detect package manager
@@ -28,7 +28,7 @@ jobs:
           if [ -f "${{ github.workspace }}/personal-website-v3/yarn.lock" ]; then
             echo "manager=yarn" >> $GITHUB_OUTPUT
             echo "command=install" >> $GITHUB_OUTPUT
-            echo "runner=yarn" >> $GITHUB_OUTPUT
+            echo "runner=yarn --silent" >> $GITHUB_OUTPUT
             exit 0
           elif [ -f "${{ github.workspace }}/personal-website-v3/package.json" ]; then
             echo "manager=npm" >> $GITHUB_OUTPUT
@@ -40,7 +40,7 @@ jobs:
             exit 1
           fi
 
-      - name: Setup Node
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: "20"
@@ -52,11 +52,10 @@ jobs:
         with:
           static_site_generator: next
 
-      - name: Restore cache
+      - name: Restore Next.js cache
         uses: actions/cache@v4
         with:
-          path: |
-            personal-website-v3/.next/cache
+          path: personal-website-v3/.next/cache
           key: ${{ runner.os }}-nextjs-${{ hashFiles('personal-website-v3/**/package-lock.json', 'personal-website-v3/**/yarn.lock') }}-${{ hashFiles('personal-website-v3/**.[jt]s', 'personal-website-v3/**.[jt]sx') }}
           restore-keys: |
             ${{ runner.os }}-nextjs-${{ hashFiles('personal-website-v3/**/package-lock.json', 'personal-website-v3/**/yarn.lock') }}-
@@ -69,17 +68,22 @@ jobs:
         run: ${{ steps.detect-package-manager.outputs.runner }} next build
         working-directory: ./personal-website-v3
 
-      - name: Upload artifact
+      - name: Export static site (generate out folder)
+        run: ${{ steps.detect-package-manager.outputs.runner }} next export
+        working-directory: ./personal-website-v3
+
+      - name: Upload artifact for GitHub Pages
+        if: ${{ success() && always() }}
         uses: actions/upload-pages-artifact@v3
         with:
           path: ./personal-website-v3/out
 
   deploy:
+    needs: build
+    runs-on: ubuntu-latest
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    needs: build
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
