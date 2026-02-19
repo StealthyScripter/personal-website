@@ -68,12 +68,7 @@ jobs:
         run: ${{ steps.detect-package-manager.outputs.runner }} next build
         working-directory: ./personal-website-v3
 
-      - name: Export static site (generate out folder)
-        run: ${{ steps.detect-package-manager.outputs.runner }} next export
-        working-directory: ./personal-website-v3
-
       - name: Upload artifact for GitHub Pages
-        if: ${{ success() && always() }}
         uses: actions/upload-pages-artifact@v3
         with:
           path: ./personal-website-v3/out
