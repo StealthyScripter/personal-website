@@ -2,6 +2,7 @@ node_modules/
 dist/
 .local/
 .tools/
+.docker-verification/
 .env
 .env.*
 !.env.example

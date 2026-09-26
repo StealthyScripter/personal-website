@@ -1,0 +1,160 @@
+name: bw-personal-website
+
+# Local development only. These deliberately public credentials are not production secrets.
+x-backend-environment: &backend-environment
+  NODE_ENV: development
+  DATABASE_URL: postgresql://website:local-database-password@postgres:5432/personal_site
+  SECURITY_SECRET: local-docker-only-session-secret-never-use-in-production
+  HOST: 0.0.0.0
+  PORT: "4000"
+  PUBLIC_ORIGIN: http://localhost:3000
+  ADMIN_ORIGIN: http://localhost:5173
+  API_ORIGIN: http://localhost:4000
+  SESSION_HOURS: "8"
+  TRUST_PROXY: ""
+  STORAGE_DRIVER: s3
+  S3_BUCKET: portfolio-development
+  S3_REGION: us-east-1
+  S3_ENDPOINT: http://minio:9000
+  AWS_ACCESS_KEY_ID: local-minio-admin
+  AWS_SECRET_ACCESS_KEY: local-minio-password-never-use-in-production
+  AWS_EC2_METADATA_DISABLED: "true"
+
+services:
+  postgres:
+    image: postgres:18-bookworm
+    environment:
+      POSTGRES_USER: website
+      POSTGRES_PASSWORD: local-database-password
+      POSTGRES_DB: personal_site
+    volumes:
+      # PostgreSQL 18 keeps PGDATA in a versioned directory beneath this path.
+      - postgres_data:/var/lib/postgresql
+    healthcheck:
+      test: [CMD-SHELL, 'pg_isready -U "$${POSTGRES_USER}" -d "$${POSTGRES_DB}"']
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 15s
+    restart: unless-stopped
+
+  minio:
+    build: ./docker/minio
+    environment:
+      MINIO_ROOT_USER: local-minio-admin
+      MINIO_ROOT_PASSWORD: local-minio-password-never-use-in-production
+    command: [server, /data, --address, ":9000", --console-address, ":9001"]
+    ports:
+      - "127.0.0.1:9000:9000"
+      - "127.0.0.1:9001:9001"
+    volumes:
+      - minio_data:/data
+    healthcheck:
+      test: [CMD, curl, --fail, --silent, --max-time, "4", http://127.0.0.1:9000/minio/health/ready]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 15s
+    restart: unless-stopped
+
+  setup:
+    build: ./personal-website-backend
+    environment: *backend-environment
+    command: [node, --import, tsx, docker/bootstrap.mjs]
+    depends_on:
+      postgres:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    volumes:
+      - ./personal-website-backend/src:/app/src:ro
+      - ./personal-website-backend/migrations:/app/migrations:ro
+      - ./personal-website-backend/seed:/app/seed:ro
+      - ./personal-website-backend/docker:/app/docker:ro
+    restart: "no"
+    init: true
+
+  backend:
+    build: ./personal-website-backend
+    environment:
+      <<: *backend-environment
+      CHOKIDAR_USEPOLLING: "true"
+      CHOKIDAR_INTERVAL: "1000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+      setup:
+        condition: service_completed_successfully
+    ports:
+      - "127.0.0.1:4000:4000"
+    volumes:
+      - ./personal-website-backend/src:/app/src:ro
+      - ./personal-website-backend/migrations:/app/migrations:ro
+      - ./personal-website-backend/seed:/app/seed:ro
+      - ./personal-website-backend/docker:/app/docker:ro
+      - verification_state:/app/.docker-verification
+    healthcheck:
+      test: [CMD, node, -e, "fetch('http://127.0.0.1:4000/health',{signal:AbortSignal.timeout(4000)}).then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 20s
+    restart: unless-stopped
+    init: true
+
+  v4:
+    build: ./personal-website-v4
+    environment:
+      NODE_ENV: development
+      BACKEND_URL: http://backend:4000
+      NEXT_PUBLIC_API_URL: http://localhost:4000
+      SITE_URL: http://localhost:3000
+      WATCHPACK_POLLING: "1000"
+      NEXT_TELEMETRY_DISABLED: "1"
+    depends_on:
+      backend:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:3000:3000"
+    volumes:
+      - ./personal-website-v4/src:/app/src:ro
+      - ./personal-website-v4/public:/app/public:ro
+    healthcheck:
+      test: [CMD, node, -e, "fetch('http://127.0.0.1:3000/',{signal:AbortSignal.timeout(15000)}).then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 15s
+      timeout: 20s
+      retries: 20
+      start_period: 60s
+    restart: unless-stopped
+    init: true
+
+  admin:
+    build: ./personal-website-admin
+    environment:
+      NODE_ENV: development
+      VITE_API_URL: http://localhost:4000
+    depends_on:
+      backend:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:5173:5173"
+    volumes:
+      - ./personal-website-admin/src:/app/src:ro
+      - ./personal-website-admin/public:/app/public:ro
+      - ./personal-website-admin/index.html:/app/index.html:ro
+    healthcheck:
+      test: [CMD, node, -e, "fetch('http://127.0.0.1:5173/',{signal:AbortSignal.timeout(4000)}).then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+      start_period: 15s
+    restart: unless-stopped
+    init: true
+
+volumes:
+  postgres_data:
+  minio_data:
+  # Empty during normal use; only the opt-in restart verification writes here.
+  verification_state:
