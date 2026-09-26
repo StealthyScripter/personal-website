@@ -1,0 +1,21 @@
+{
+  "title": "Social Collaboration Tool",
+  "slug": "social-collaboration",
+  "summary": "A shared place for teams to talk, organize, and work together.",
+  "description": ["A cross-platform collaboration app for distributed teams. Messaging, shared files, and task boards bring the everyday pieces of working together into one place."],
+  "featured": true,
+  "order": 3,
+  "coverImage": {
+    "src": "/projects/project-collab.png",
+    "alt": "Illustration of a team workspace with messaging, shared files, and a project board",
+    "caption": "Project illustration from the previous website; not a verified product screenshot."
+  },
+  "features": [
+    { "title": "Team conversations", "description": "Real-time messaging keeps distributed teams connected." },
+    { "title": "Shared files", "description": "Share the files needed to work together." },
+    { "title": "Task boards", "description": "Organize tasks and manage work in a shared project space." }
+  ],
+  "technologies": ["JavaScript", "Python", "SQLite", "TypeScript"],
+  "repositoryUrl": "https://gitlab.com/simba_ndlovu/senior-project.git",
+  "contentNote": "This overview is based on the previous website. Current status, product screenshots, and a fuller project story are still to come."
+}

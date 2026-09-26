@@ -1,0 +1,12 @@
+/node_modules/
+/.next/
+/.next-integration/
+/out/
+/.tools/
+/test-results/
+/playwright-report/
+*.tsbuildinfo
+next-env.d.ts
+.env*
+!.env.example
+npm-debug.log*

@@ -1,0 +1,20 @@
+{
+  "name": "Brian Wendot",
+  "description": "A collection of projects, ideas, and things worth sharing by Brian Wendot.",
+  "email": "koringo.w.brian@gmail.com",
+  "hero": {
+    "eyebrow": "A personal corner of the internet",
+    "thought": "Curiosity turns ordinary days into interesting ones.",
+    "introduction": "I like taking an idea, pulling it apart, and seeing what it could become. This is where I keep the projects, experiments, and occasional discoveries that come out of that process."
+  },
+  "about": [
+    "I'm interested in how things work—and what happens when you try to make them work a little better.",
+    "Some of that curiosity turns into software. Some becomes an experiment, a note, or simply a question worth following. This site is where I keep the parts worth returning to.",
+    "If something here overlaps with what you're working on, I'd be glad to hear about it."
+  ],
+  "social": [
+    { "label": "GitHub", "url": "https://github.com/StealthyScripter" },
+    { "label": "LinkedIn", "url": "https://linkedin.com/in/brian-koringo" },
+    { "label": "X / Twitter", "url": "https://x.com/wendotbrian" }
+  ]
+}

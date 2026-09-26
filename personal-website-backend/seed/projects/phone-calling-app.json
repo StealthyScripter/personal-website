@@ -1,0 +1,20 @@
+{
+  "title": "Phone Calling App",
+  "slug": "phone-calling-app",
+  "summary": "Making international calls with a local US number.",
+  "description": ["A phone calling application that lets people use local US numbers to make international calls. It brings call management and billing together in one place."],
+  "featured": true,
+  "order": 1,
+  "coverImage": {
+    "src": "/projects/project-phone.png",
+    "alt": "Illustration of a calling interface with an active call and a number pad",
+    "caption": "Project illustration from the previous website; not a verified product screenshot."
+  },
+  "features": [
+    { "title": "International calling", "description": "Use a local US number to make international calls." },
+    { "title": "Call management", "description": "Manage calls in real time within the application." },
+    { "title": "Integrated billing", "description": "Billing is part of the calling experience." }
+  ],
+  "technologies": ["React Native", "Node.js", "PostgreSQL", "Stripe", "Twilio", "Redis"],
+  "contentNote": "This overview is based on the previous website. Current status, product screenshots, and a fuller project story are still to come."
+}

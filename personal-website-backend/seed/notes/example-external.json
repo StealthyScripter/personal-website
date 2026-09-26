@@ -1,0 +1,12 @@
+{
+  "kind": "external",
+  "title": "Replace with the original resource title",
+  "slug": "example-external",
+  "date": "2026-09-23",
+  "category": "Worth reading",
+  "summary": "Describe the resource in your own words.",
+  "source": "Replace with the publication or author",
+  "externalUrl": "https://example.com",
+  "myComment": "Write why you are sharing this. Do not copy the original article here.",
+  "published": false
+}

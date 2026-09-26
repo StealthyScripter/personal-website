@@ -1,0 +1,21 @@
+{
+  "title": "AI Trading Analytics Dashboard",
+  "slug": "trading-analytics",
+  "summary": "Market data and machine learning insights, brought into view.",
+  "description": ["An interactive dashboard that brings real-time market data and machine learning insights together. Charts and customizable views help make patterns in the data easier to explore."],
+  "featured": true,
+  "order": 2,
+  "coverImage": {
+    "src": "/projects/project-trading.png",
+    "alt": "Illustration of a trading dashboard with market charts and analytics panels",
+    "caption": "Project illustration from the previous website; not a verified product screenshot."
+  },
+  "features": [
+    { "title": "Market data in one place", "description": "Explore real-time market data through an interactive dashboard." },
+    { "title": "Patterns and predictions", "description": "Machine learning supports predictive modeling and pattern recognition." },
+    { "title": "Customizable views", "description": "Adjust data visualizations to explore different perspectives." }
+  ],
+  "technologies": ["Python", "TypeScript", "TensorFlow", "JavaScript"],
+  "repositoryUrl": "https://github.com/StealthyScripter/TradingSystem.git",
+  "contentNote": "This overview is based on the previous website. Current status, product screenshots, and a fuller project story are still to come."
+}
