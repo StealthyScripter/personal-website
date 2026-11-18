@@ -1,6 +1,8 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { projectSchema, noteSchema, assetPath } from '../src/lib/content/schema';
+import { renderToStaticMarkup } from 'react-dom/server';
+import Home from '../src/app/page';
 
 const minimalProject = {
   title: 'Example', slug: 'example', summary: 'An example project.', description: ['An explanation.'],
@@ -40,4 +42,18 @@ test('original and external notes require their own content and default to draft
 test('local video requires a transcript and external video does not require a file', () => {
   assert.equal(projectSchema.safeParse({ ...minimalProject, video: { kind: 'file', src: '/demo.webm', caption: 'A demo' } }).success, false);
   assert.equal(projectSchema.safeParse({ ...minimalProject, video: { kind: 'external', url: 'https://example.com', caption: 'A demo' } }).success, true);
+});
+
+test('homepage distinguishes unavailable collections from successful empty responses', async (t) => {
+  const fetch = t.mock.method(globalThis, 'fetch', async () => new Response('{}', { status: 503 }));
+  const failed = renderToStaticMarkup(await Home());
+  assert.match(failed, /This content is temporarily unavailable/);
+  assert.doesNotMatch(failed, /Work in Progress|A little room for ideas\./);
+  fetch.mock.mockImplementation(async () => new Response(JSON.stringify({ items: [] }), { status: 200 }));
+  const empty = renderToStaticMarkup(await Home());
+  assert.match(empty, /Featured Work/);
+  assert.match(empty, /Work in Progress/);
+  assert.match(empty, /A little room for ideas\./);
+  // Settings are deliberately invalid in this fixture; only the collections succeeded.
+  assert.doesNotMatch(empty.match(/<section id="projects"[\s\S]*?<\/section>/)?.[0] || '', /temporarily unavailable/);
 });

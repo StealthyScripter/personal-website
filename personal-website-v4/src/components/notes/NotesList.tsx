@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { Arrow } from '@/components/ui/Arrow';
 
 export function NotesList({ notes }: { notes: Note[] }) {
-  if (!notes.length) return <div className="notes-empty"><span className="empty-mark" aria-hidden="true">✳</span><div><h3>A little room for ideas.</h3><p>No notes published yet. This space is for reflections and things worth sharing.</p></div></div>;
+  if (!notes.length) return <div className="notes-empty"><span className="empty-mark" aria-hidden="true">✳</span><div><h3>A little room for ideas.</h3><p>A space for reflections, technical insights, and ideas worth exploring. Notes will appear here as they are published.</p></div></div>;
   return <div className="notes-list">{notes.map((note) => <article className="note-row" key={note.slug}>
     <div className="note-meta"><span className="eyebrow">{note.category}</span><time dateTime={note.date}>{formatDate(note.date)}</time></div>
     <div>{note.image && <Image className="note-thumbnail" src={assetUrl(note.image.src)} alt={note.image.alt} width={note.image.width} height={note.image.height} />}

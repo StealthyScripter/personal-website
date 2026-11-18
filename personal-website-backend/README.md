@@ -22,7 +22,20 @@ Without an installed PostgreSQL server, run `npm run db:local` in a separate ter
 
 Seed is explicit and idempotent: it never overwrites an existing slug/settings. It imports three existing portfolio projects and their re-encoded covers, keeps two example notes unpublished, and creates four Currently slots. Backend-owned `seed/` is an import snapshot, not a production read path. The seeded covers are illustrative previews inherited from the old portfolio, not newly verified screenshots.
 
+To apply the approved professional portfolio biography, hero and description to an
+existing installation, run `node --env-file=.env node_modules/tsx/dist/cli.mjs src/cli.ts refine-copy`
+from this directory after initial setup. This explicit editorial update validates
+the existing settings schema, preserves name/email/social links and checks the
+settings version before writing. It does not change projects, notes or accounts.
+It is not run at startup; subsequent edits remain available through Admin Settings.
+Running it again intentionally restores the approved copy. Historical seed snapshots
+remain unchanged.
+
 ## Account management (backend only)
+
+For the reviewed seven-project GitHub draft import, its safe rerun commands and
+publication checklist, see [imports/README.md](imports/README.md). Imports use the
+existing content service and leave PostgreSQL authoritative.
 
 ```sh
 npm run admin -- create your-email@example.com

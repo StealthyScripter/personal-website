@@ -2,6 +2,7 @@ import { getConfig } from './config.js';
 import { database, migrate } from './db.js';
 import { seed } from './seed.js';
 import { manageAccount } from './accounts.js';
+import { refinePortfolioCopy } from './refine-copy.js';
 
 async function readPassword() {
   if (process.argv.includes('--password-stdin')) {
@@ -30,7 +31,8 @@ try {
   const [, , command, action, email] = process.argv;
   if (command === 'migrate') { await migrate(db); console.log('Migrations applied.'); }
   else if (command === 'seed') { await seed(db, config); console.log('Seed imported without overwriting existing content.'); }
+  else if (command === 'refine-copy') { await refinePortfolioCopy(db); console.log('Portfolio copy updated in editable site settings.'); }
   else if (command === 'admin') console.log(await manageAccount(db, action, email, ['create', 'password'].includes(action) ? await readPassword() : undefined));
   else if (command === 'prune') { await db.query('DELETE FROM admin_sessions WHERE expires_at<now()'); await db.query('DELETE FROM rate_limits WHERE expires_at<now()'); console.log('Expired sessions and rate limits removed.'); }
-  else throw new Error('Use migrate, seed, admin, or prune.');
+  else throw new Error('Use migrate, seed, refine-copy, admin, or prune.');
 } finally { await db.end(); }

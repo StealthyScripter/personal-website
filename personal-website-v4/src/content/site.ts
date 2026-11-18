@@ -2,5 +2,5 @@
 export const site = {
   name: 'Brian Wendot',
   url: process.env.SITE_URL || 'https://brianwendot.com',
-  description: 'Projects, experiments, and things worth sharing by Brian Wendot.',
+  description: 'Explore the portfolio of Brian Wendot, a Computer Science graduate interested in software development, research, healthcare technology, and meaningful digital innovation.',
 };

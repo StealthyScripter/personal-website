@@ -10,6 +10,20 @@ async function signIn(page: Page) {
 async function section(page: Page, name: string) { await page.getByRole('navigation').getByRole('button', { name, exact: true }).click(); }
 async function save(page: Page) { await page.getByRole('button', { name: /^Save (project|note)$/ }).last().click(); await expect(page.getByRole('status')).toContainText(/saved|Published/); }
 
+test('professional copy, metadata and hero navigation preserve the editorial homepage', async ({ page }) => {
+  await page.goto(publicUrl);
+  await expect(page).toHaveTitle('Brian Wendot | Computer Science & Software Development');
+  await expect(page.locator('meta[name="description"]')).toHaveAttribute('content', /Computer Science graduate interested in software development, research, healthcare technology/);
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Exploring ideas. Building solutions. Creating impact.');
+  await expect(page.locator('.hero-introduction p')).toHaveCount(2);
+  await expect(page.locator('#about .prose p')).toHaveCount(5);
+  await page.getByRole('link', { name: 'Explore Projects', exact: true }).click();
+  await expect(page).toHaveURL(/\/#projects$/);
+  await page.getByRole('link', { name: 'More About Me', exact: true }).click();
+  await expect(page).toHaveURL(/\/#about$/);
+  await expect(page.locator('.hero .landscape')).toBeAttached();
+});
+
 test('admin project workflow publishes actual content to server-rendered V4', async ({ page, context, request }) => {
   await signIn(page); await section(page, 'Projects'); await page.getByRole('button', { name: 'Create project', exact: true }).click();
   await page.getByLabel('Title', { exact: true }).fill('Browser verification project'); await page.getByLabel('Slug', { exact: true }).fill('browser-verification'); await page.getByLabel('Summary / excerpt').fill('A browser-created project summary.'); await page.getByLabel('Overview (blank lines separate paragraphs)').fill('This project was created through the admin interface.');
@@ -60,9 +74,9 @@ test('admin media deletion, settings and concurrent editor feedback', async ({ p
   await page.getByLabel('Upload image', { exact: true }).setInputFiles(imagePath);
   const uploaded = page.locator('.cards article').first(); await expect(uploaded).toContainText('project-phone.png');
   page.once('dialog', (dialog) => dialog.accept()); await uploaded.getByRole('button', { name: 'Delete media' }).click();
-  await section(page, 'Settings'); await page.getByLabel('Hero thought').fill('A browser-tested thought.'); await page.getByRole('button', { name: 'Save settings', exact: true }).click(); await expect(page.getByRole('status')).toContainText('Settings saved.');
+  await section(page, 'Settings'); await expect(page.getByLabel('Hero thought')).toBeVisible(); const initialThought = await page.getByLabel('Hero thought').inputValue(); await page.getByLabel('Hero thought').fill('A browser-tested thought.'); await page.getByRole('button', { name: 'Save settings', exact: true }).click(); await expect(page.getByRole('status')).toContainText('Settings saved.');
   const second = await context.newPage(); await second.goto('/'); await section(second, 'Settings'); await expect(second.getByLabel('Hero thought')).toHaveValue('A browser-tested thought.');
-  await page.getByLabel('Hero thought').fill('Curiosity turns ordinary days into interesting ones.'); await page.getByRole('button', { name: 'Save settings', exact: true }).click(); await expect(page.getByRole('status')).toContainText('Settings saved.');
+  await page.getByLabel('Hero thought').fill(initialThought); await page.getByRole('button', { name: 'Save settings', exact: true }).click(); await expect(page.getByRole('status')).toContainText('Settings saved.');
   await second.getByLabel('Hero thought').fill('An outdated editor value.'); await second.getByRole('button', { name: 'Save settings', exact: true }).click(); await expect(second.getByRole('alert')).toContainText('Settings changed. Reload first.'); await expect(second.getByLabel('Hero thought')).toHaveValue('An outdated editor value.');
   await page.setViewportSize({ width: 375, height: 900 }); expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true); await page.screenshot({ path: 'test-results/admin-settings-mobile.png', fullPage: true });
 });
@@ -81,4 +95,52 @@ for (const width of [320, 375, 430, 768, 1024, 1440]) test(`brand, navigation an
   await page.getByRole('navigation').getByRole('link', { name: 'About', exact: true }).click(); await expect(page).toHaveURL(/\/#about$/);
   await page.goto(`${publicUrl}/projects/phone-calling-app/`); if (width < 768) await page.getByRole('button', { name: 'Menu', exact: true }).click(); await page.getByRole('navigation').getByRole('link', { name: 'Contact', exact: true }).click(); await expect(page).toHaveURL(/\/#contact$/);
   await page.emulateMedia({ reducedMotion: 'reduce' }); expect(await page.evaluate(() => getComputedStyle(document.documentElement).scrollBehavior)).toBe('auto'); expect(errors).toEqual([]);
+});
+
+test('empty portfolio remains complete and project creation and final deletion update the homepage', async ({ page, context }) => {
+  await signIn(page); await section(page, 'Projects');
+  page.on('dialog', (dialog) => dialog.accept());
+  const removeProjects = async () => {
+    while (await page.locator('.entry-list article').count()) {
+      const count = await page.locator('.entry-list article').count();
+      await page.locator('.entry-list article').first().getByRole('button', { name: /^Delete/ }).click();
+      await expect(page.locator('.entry-list article')).toHaveCount(count - 1);
+    }
+  };
+  await expect(page.locator('.entry-list article').first()).toBeVisible();
+  await removeProjects();
+  await section(page, 'Notes');
+  await expect(page.locator('.entry-list article').first()).toBeVisible();
+  while (await page.locator('.entry-list article').count()) {
+    const count = await page.locator('.entry-list article').count();
+    await page.locator('.entry-list article').first().getByRole('button', { name: /^Delete/ }).click();
+    await expect(page.locator('.entry-list article')).toHaveCount(count - 1);
+  }
+  const visitor = await context.newPage(); await visitor.goto(publicUrl);
+  await expect(visitor.getByRole('heading', { name: 'Featured Work', exact: true })).toBeVisible();
+  await expect(visitor.getByRole('heading', { name: 'Work in Progress', exact: true })).toBeVisible();
+  await expect(visitor.locator('#projects .project-card')).toHaveCount(0);
+  await expect(visitor.getByRole('heading', { name: 'A little room for ideas.', exact: true })).toBeVisible();
+  await expect(visitor.locator('#about .prose p')).toHaveCount(5);
+  await expect(visitor.getByRole('link', { name: 'More About Me' })).toHaveAttribute('href', '#about');
+  for (const width of [375, 1440]) {
+    await visitor.setViewportSize({ width, height: 1000 });
+    expect(await visitor.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    await visitor.screenshot({ path: `test-results/empty-portfolio-${width}.png`, fullPage: true });
+  }
+  await section(page, 'Projects'); await page.getByRole('button', { name: 'Create project', exact: true }).click();
+  await page.getByLabel('Title', { exact: true }).fill('Empty state verification');
+  await page.getByLabel('Slug', { exact: true }).fill('empty-state-verification');
+  await page.getByLabel('Summary / excerpt').fill('Disposable integration test content.');
+  await page.getByLabel('Overview (blank lines separate paragraphs)').fill('Created through the existing admin.');
+  await page.getByLabel('Upload cover image', { exact: true }).setInputFiles(imagePath);
+  await page.getByLabel('Cover image alt text', { exact: true }).fill('Verification cover');
+  await page.getByLabel('Featured on homepage', { exact: true }).check();
+  await page.getByLabel('Published', { exact: true }).check(); await save(page);
+  await visitor.reload();
+  await expect(visitor.locator('#projects .project-card')).toHaveCount(1);
+  await expect(visitor.getByRole('heading', { name: 'Work in Progress', exact: true })).toHaveCount(0);
+  await page.getByRole('button', { name: 'Back to list' }).click();
+  await removeProjects(); await visitor.reload();
+  await expect(visitor.getByRole('heading', { name: 'Work in Progress', exact: true })).toBeVisible();
 });

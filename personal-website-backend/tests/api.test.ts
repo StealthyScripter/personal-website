@@ -10,6 +10,9 @@ import { database, migrate } from '../src/db.js';
 import { buildApp } from '../src/app.js';
 import { manageAccount } from '../src/accounts.js';
 import { seed } from '../src/seed.js';
+import { refinePortfolioCopy } from '../src/refine-copy.js';
+import { planProjectImport, applyProjectImport, projectImportSchema } from '../src/import-projects.js';
+import { saveContent } from '../src/content.js';
 import { validateUpload } from '../src/media.js';
 
 test('real PostgreSQL API, CLI, security and content workflows', { timeout: 120000 }, async (t) => {
@@ -34,6 +37,55 @@ test('real PostgreSQL API, CLI, security and content workflows', { timeout: 1200
       assert.equal((await db.query('SELECT count(*)::int AS count FROM content_items')).rows[0].count, 9);
       assert.equal((await app.inject('/api/projects')).json().items.length, 3);
       assert.equal((await app.inject('/api/notes')).json().items.length, 0);
+    });
+    await t.test('editorial update preserves identity, content and subsequent admin editability', async () => {
+      const before = (await db.query('SELECT content,version FROM site_settings WHERE id=1')).rows[0];
+      await refinePortfolioCopy(db);
+      const after = (await db.query('SELECT content,version FROM site_settings WHERE id=1')).rows[0];
+      assert.equal(after.content.name, before.content.name);
+      assert.equal(after.content.email, before.content.email);
+      assert.deepEqual(after.content.social, before.content.social);
+      assert.equal(after.content.about.length, 5);
+      assert.equal(after.content.hero.thought, 'Exploring ideas. Building solutions. Creating impact.');
+      assert.equal(after.version, before.version + 1);
+      await refinePortfolioCopy(db);
+      assert.equal((await db.query('SELECT version FROM site_settings WHERE id=1')).rows[0].version, after.version);
+      await seed(db, config);
+      assert.equal((await app.inject('/api/settings')).json().hero.thought, after.content.hero.thought);
+      assert.equal((await app.inject('/api/projects')).json().items.length, 3);
+    });
+    await t.test('repository import is repeatable, preserves curated data and leaves reviewed drafts private', async () => {
+      const manifest = projectImportSchema.parse(JSON.parse(await fs.readFile('imports/github-projects.json', 'utf8')));
+      const rows = async () => (await db.query("SELECT id,version,content FROM content_items WHERE kind='project' ORDER BY sort_order,created_at")).rows;
+      const before = await rows();
+      const first = await applyProjectImport(db, planProjectImport(manifest, before));
+      assert.equal(first.filter((entry) => entry.action === 'create').length, 7);
+      const imported = await rows();
+      assert.equal(imported.length, before.length + 7);
+      assert.deepEqual(imported.slice(0, 7).map((row) => row.content.title), manifest.map((entry) => entry.content.title));
+      assert.deepEqual(imported.filter((row) => row.content.featured).map((row) => row.content.title), ['Jenga', 'Jukwaa', 'Companion']);
+      for (const entry of manifest) {
+        const row = imported.find((row) => row.content.slug === entry.content.slug);
+        assert.equal(row.content.published, false);
+        assert.equal((await app.inject(`/api/projects/${row.content.slug}`)).statusCode, 404);
+        if (entry.private) assert.equal(row.content.repositoryUrl, undefined);
+      }
+      for (const previous of before) {
+        const row = imported.find((row) => row.id === previous.id);
+        assert.deepEqual({ ...row.content, order: previous.content.order, featured: previous.content.featured }, previous.content);
+      }
+      const repeated = planProjectImport(manifest, imported);
+      assert.ok(repeated.every((entry) => entry.action === 'unchanged'));
+      await applyProjectImport(db, repeated);
+      assert.deepEqual(await rows(), imported);
+      const curated = imported[0];
+      await saveContent(db, 'project', { ...curated.content, summary: 'A manually curated project summary.' }, curated.id, curated.version);
+      const next = planProjectImport(manifest, await rows());
+      assert.equal(next[0].content.summary, 'A manually curated project summary.');
+      assert.ok(next[0].preservedFields.includes('summary'));
+      assert.throws(() => planProjectImport(manifest, [...imported, { ...curated, id: randomUUID() }] ), /Ambiguous existing records/);
+      assert.throws(() => planProjectImport(manifest, [{ ...curated, content: { ...curated.content, repositoryUrl: 'https://github.com/example/different-project' } }]), /Conflicting repository identity/);
+      assert.throws(() => planProjectImport([manifest[0], { ...manifest[1], content: { ...manifest[1].content, order: 1 } }], []), /Duplicate import identity or display order/);
     });
     await t.test('CLI creates an Argon2id account without disclosing passwords or hashes', async () => {
       const result = spawnSync(process.execPath, ['node_modules/tsx/dist/cli.mjs', 'src/cli.ts', 'admin', 'create', email, '--password-stdin'], { env: { ...env, DATABASE_URL: config.DATABASE_URL }, input: `${password}\n`, encoding: 'utf8', windowsHide: true });

@@ -1,0 +1,418 @@
+[
+  {
+    "repository": "Jenga",
+    "private": true,
+    "revision": "097db46cb2ccee5343330b31aea3c926ce5d1cb5",
+    "evidence": [
+      "package.json",
+      "components/LandingPage.tsx",
+      "server/sync/processBatch.ts",
+      "docs/mobile/MOBILE_CONTEXT.md"
+    ],
+    "review": [
+      "Approve the public description of this private project.",
+      "Supply an approved, redacted product screenshot.",
+      "The documented public landing URL returned HTTP 404."
+    ],
+    "content": {
+      "title": "Jenga",
+      "slug": "jenga",
+      "order": 1,
+      "featured": true,
+      "published": false,
+      "summary": "A construction project workspace that connects budgets, milestones, expenses, and progress evidence.",
+      "description": [
+        "Jenga brings the day-to-day records of a construction project into one workspace. Project dashboards connect milestones, checklist completion, budget allocations, expenses, and recent activity so progress and costs can be considered together.",
+        "The application includes project membership and permissions, shared files, notifications, and progress entries with photo evidence. Its web/backend code also defines a synchronization contract for a separate mobile client, including validation of incoming changes."
+      ],
+      "features": [
+        {
+          "title": "Budget and expense tracking",
+          "description": "Connect recorded expenses to budget items and compare allocated amounts with actual spending."
+        },
+        {
+          "title": "Milestones and progress evidence",
+          "description": "Organize milestone checklists and record progress with notes and photos, with location requirements where configured."
+        },
+        {
+          "title": "Project access and synchronization",
+          "description": "Manage project members and permissions while validating synchronized records through the backend."
+        }
+      ],
+      "technologies": [
+        "TypeScript",
+        "React",
+        "Vite",
+        "Node.js",
+        "Express",
+        "PostgreSQL"
+      ],
+      "technicalDescription": [
+        "A React and TypeScript interface communicates with an Express API backed by PostgreSQL. Entity contracts and a backend synchronization pipeline separate record validation, ownership checks, and batch processing.",
+        "The source includes background queue workers for notifications and project rollups. The separate mobile application was not inspected or run as part of this portfolio import."
+      ],
+      "currentStatus": "Source reviewed; end-to-end application behavior and deployment availability have not been verified for this case study.",
+      "contentNote": "Draft for public-content review. An approved product screenshot is still needed."
+    }
+  },
+  {
+    "repository": "Jukwaa",
+    "private": true,
+    "revision": "c853c1f8456e15dcaae38905aa7c631c0846cefd",
+    "evidence": [
+      "README.md",
+      "TECHNICAL_GUIDE.md",
+      "requirements.txt",
+      "jkwa/strategies/schema.py",
+      "jkwa/execution/service.py"
+    ],
+    "review": [
+      "Approve the public description of this private project.",
+      "Existing screenshots describe a retired interface; supply approved V2 screenshots."
+    ],
+    "content": {
+      "title": "Jukwaa",
+      "slug": "jukwaa",
+      "order": 2,
+      "featured": true,
+      "published": false,
+      "summary": "A strategy workspace for defining trading rules, approving configurations, and inspecting simulated execution.",
+      "description": [
+        "Jukwaa is a user-controlled workspace for declarative trading strategies. Users import a JSON or YAML definition, configure supported parameters, assign an account, and approve the exact configuration before enabling evaluation.",
+        "The current V2 application separates strategy definitions, deployment approvals, market-data retrieval, and simulated execution. It can evaluate completed practice-market candles or deterministic fixtures, but order execution remains mock-only; it is not a live-trading or production-ready system."
+      ],
+      "features": [
+        {
+          "title": "Validated strategy definitions",
+          "description": "Import versioned JSON or YAML rules with explicit indicators, comparisons, crossings, and parameter bounds."
+        },
+        {
+          "title": "Configuration approval",
+          "description": "Bind manual approval to an exact deployment snapshot and invalidate execution when authorization or configuration changes."
+        },
+        {
+          "title": "Inspectable mock execution",
+          "description": "Record simulated signals and orders, reconcile uncertain responses, and recover persisted work after a restart."
+        }
+      ],
+      "technologies": [
+        "Python",
+        "FastAPI",
+        "Pydantic",
+        "SQLAlchemy",
+        "PostgreSQL",
+        "SQLite",
+        "Jinja2",
+        "JavaScript"
+      ],
+      "technicalDescription": [
+        "Feature services separate accounts, strategies, deployments, execution, and market data. Typed strategy contracts reject unsupported rules instead of interpreting arbitrary uploaded code.",
+        "Execution consumes approved configuration snapshots and persists intents before mock broker calls. The current composition enables read-only practice candle retrieval and a mock broker, with no enabled real-order submission path."
+      ],
+      "currentStatus": "V2 is the primary application in the reviewed source. All execution is simulated; portfolio review did not run the application or independently reproduce its recovery tests.",
+      "contentNote": "Draft for public-content review. Historical interface screenshots were not imported."
+    }
+  },
+  {
+    "repository": "Companion",
+    "private": true,
+    "revision": "c80507ead2211d47c37f097a1a7638121db1a600",
+    "evidence": [
+      "metadata.json",
+      "README.md",
+      "package.json",
+      "src/lib/baselineRules.ts",
+      "src/lib/cloudSync.ts"
+    ],
+    "review": [
+      "Approve the public description of this private project.",
+      "Supply screenshots containing no personal schedules, documents, or account data."
+    ],
+    "content": {
+      "title": "Companion",
+      "slug": "companion",
+      "order": 3,
+      "featured": true,
+      "published": false,
+      "summary": "An academic planning workspace that brings tasks, schedules, study materials, and review activities together.",
+      "description": [
+        "Companion organizes academic work around connected courses, tasks, events, notes, and study materials. A daily view and deterministic priority rules help surface pending work and upcoming commitments without requiring an automated decision-making service.",
+        "The workspace includes a study library, flashcards, structured import previews, and study-session tools. Local persistence and queued cloud synchronization support offline edits, while a server-side Telegram adapter can provide account-linked summaries and scheduled messages when configured."
+      ],
+      "features": [
+        {
+          "title": "Connected academic planning",
+          "description": "Bring tasks, events, courses, and study resources into a shared planning workflow."
+        },
+        {
+          "title": "Review before import",
+          "description": "Validate and edit structured intake previews before approving changes to academic records."
+        },
+        {
+          "title": "Offline and cloud records",
+          "description": "Queue local changes for revision-aware synchronization with the PostgreSQL-backed service."
+        }
+      ],
+      "technologies": [
+        "TypeScript",
+        "React",
+        "Vite",
+        "Node.js",
+        "PostgreSQL",
+        "Tailwind CSS"
+      ],
+      "technicalDescription": [
+        "The React interface keeps local application records and queues mutations for a separate cloud service. Synchronization carries stable record IDs and base revisions, allowing the server to detect conflicts rather than silently replacing newer changes.",
+        "The Telegram adapter uses the same cloud records and mutation service as the website. Private account details and academic materials are excluded from this case study."
+      ],
+      "currentStatus": "The reviewed source includes local development, database, and browser-test workflows. Those application tests and external notification delivery were not rerun during this import.",
+      "contentNote": "Draft for public-content review. No private documents or application media were imported."
+    }
+  },
+  {
+    "repository": "smart-inventory-system",
+    "private": false,
+    "revision": "6f6c79ce80b02f35b0a7bffae50ae39a55d8756d",
+    "evidence": [
+      "README.md",
+      "Gemfile",
+      "config/routes.rb",
+      "app/controllers/inventory_controller.rb",
+      "app/models/stock_movement.rb"
+    ],
+    "review": [
+      "Supply authentic inventory screenshots.",
+      "README scope and broader routes differ; the case study describes only verified inventory workflows.",
+      "The repository homepage URL returned HTTP 404 and was omitted."
+    ],
+    "content": {
+      "title": "Smart Inventory System",
+      "slug": "smart-inventory-system",
+      "order": 4,
+      "featured": false,
+      "published": false,
+      "summary": "A Rails inventory application for managing products, suppliers, locations, and auditable stock adjustments.",
+      "description": [
+        "Smart Inventory System supports inventory work across locations: maintaining a product catalog, managing suppliers, checking stock levels, and recording adjustments. Its documented inventory roles distinguish organization-wide access from location-scoped changes and read-only access.",
+        "The stock adjustment workflow records both the changed quantity and the responsible user. The portfolio focuses on this inventory functionality; broader marketplace routes in the repository are not presented as completed product capabilities."
+      ],
+      "features": [
+        {
+          "title": "Stock across locations",
+          "description": "Inspect product quantities by location with access scoped to the current user's permissions."
+        },
+        {
+          "title": "Auditable adjustments",
+          "description": "Update stock and create a corresponding stock movement inside a database transaction."
+        },
+        {
+          "title": "Catalog and supplier management",
+          "description": "Maintain the product, location, and supplier records used by inventory workflows."
+        }
+      ],
+      "technologies": [
+        "Ruby",
+        "Rails 8",
+        "SQLite",
+        "ERB",
+        "Turbo",
+        "Stimulus"
+      ],
+      "repositoryUrl": "https://github.com/StealthyScripter/smart-inventory-system",
+      "technicalDescription": [
+        "Rails renders ERB views and uses Active Record with SQLite. Turbo and Stimulus provide interface behavior without a separate single-page application.",
+        "Stock adjustments update the stock level and append a movement record within one transaction. Controller checks restrict adjustment operations to authorized roles and accessible locations."
+      ],
+      "currentStatus": "Inventory features are present in the reviewed source. Deployment and end-to-end application operation were not verified; the configured repository demo URL returned HTTP 404.",
+      "contentNote": "Product screenshots are still needed."
+    }
+  },
+  {
+    "repository": "PesaFlow",
+    "private": false,
+    "revision": "fe0894ef18cd1c0e264389542331b8dbe9fc9b89",
+    "evidence": [
+      "README.md",
+      "backend/package.json",
+      "frontend/package.json",
+      "backend/routes/transaction.routes.js",
+      "backend/routes/auth.routes.js",
+      "backend/models/transactions.models.js"
+    ],
+    "review": [
+      "Supply authentic screenshots.",
+      "README authentication limitations are stale relative to source; no production-security claim is made.",
+      "No live demo verified."
+    ],
+    "content": {
+      "title": "PesaFlow",
+      "slug": "pesaflow",
+      "order": 5,
+      "featured": false,
+      "published": false,
+      "summary": "A full-stack SACCO management project for member accounts, financial transactions, and administrative review.",
+      "description": [
+        "PesaFlow explores the connected workflows of a savings and credit cooperative: member records, accounts, transactions, and administrative review. A Next.js interface communicates with an Express API and MongoDB data models for users, accounts, and transaction history.",
+        "The transaction workflow supports financial categories, status changes, and filtered lists. The case study describes the implemented application structure without claiming production financial use, verified security, or live payment processing."
+      ],
+      "features": [
+        {
+          "title": "Member and account records",
+          "description": "Manage related member and account information through dedicated API routes and frontend services."
+        },
+        {
+          "title": "Transaction workflows",
+          "description": "Create and inspect transactions with types, amounts, categories, and lifecycle statuses."
+        },
+        {
+          "title": "Filtered transaction history",
+          "description": "Query records by member, status, transaction type, date range, and amount with pagination."
+        }
+      ],
+      "technologies": [
+        "JavaScript",
+        "TypeScript",
+        "Next.js",
+        "React",
+        "Node.js",
+        "Express",
+        "MongoDB",
+        "Mongoose",
+        "Tailwind CSS"
+      ],
+      "repositoryUrl": "https://github.com/StealthyScripter/PesaFlow",
+      "technicalDescription": [
+        "Separate frontend service modules isolate API communication for accounts, users, authentication, and transactions. Mongoose schemas define transaction types, amount validation, and status values.",
+        "The source contains password and token-related authentication code beyond the README's older member-number-only description. This import did not audit that implementation or verify financial transaction integrity under concurrent use."
+      ],
+      "currentStatus": "A development application with source-level CRUD and transaction workflows. No production deployment or live financial-service integration was verified.",
+      "contentNote": "Product screenshots are still needed."
+    }
+  },
+  {
+    "repository": "WiBuddy",
+    "private": false,
+    "revision": "e50ac7ccf6407253ffe7b9494e34a5ea61ba3c28",
+    "evidence": [
+      "angular-frontend/package.json",
+      "angular-frontend/src/app/app.routes.ts",
+      "flask-backend/requirements.txt",
+      "flask-backend/app/services/task_service.py",
+      "flask-backend/app/resources/ai_resource.py",
+      "flask-backend/app/services/ai_service.py"
+    ],
+    "review": [
+      "Repository image candidates are small icons, not product screenshots.",
+      "Provider-backed study assistance requires configuration; it was not exercised.",
+      "No live demo verified."
+    ],
+    "content": {
+      "title": "WiBuddy",
+      "slug": "wibuddy",
+      "order": 6,
+      "featured": false,
+      "published": false,
+      "summary": "A task and learning workspace combining project planning, calendars, notes, and configurable study-assistance services.",
+      "description": [
+        "WiBuddy combines project and task organization with learning tools. Its Angular interface includes task details, project views, calendar pages, notes, study resources, and progress-related screens, supported by a Flask backend.",
+        "The backend includes provider-backed routes for generating summaries and flashcards from supplied content. Those features depend on separately configured AI services; their presence in source is not a claim that an external provider or deployed application has been verified."
+      ],
+      "features": [
+        {
+          "title": "Project and task planning",
+          "description": "Create tasks with due dates, estimated durations, completion state, and project relationships."
+        },
+        {
+          "title": "Learning workspace",
+          "description": "Organize notes and learning resources alongside calendar and project views."
+        },
+        {
+          "title": "Configurable study assistance",
+          "description": "Backend endpoints connect supplied content to summary and flashcard generation through a configured provider."
+        }
+      ],
+      "technologies": [
+        "TypeScript",
+        "Angular",
+        "RxJS",
+        "Python",
+        "Flask",
+        "SQLAlchemy",
+        "Tailwind CSS"
+      ],
+      "repositoryUrl": "https://github.com/StealthyScripter/WiBuddy",
+      "technicalDescription": [
+        "Angular route components organize the interface, while Flask resources delegate persistence operations to service modules and SQLAlchemy models.",
+        "The study-assistance service selects an OpenAI or Anthropic client through server configuration and reports an error when no provider is available. No provider credentials or personal study content are included in this case study."
+      ],
+      "currentStatus": "Task and learning workflows are present in the reviewed source. Full frontend/backend behavior and external AI integrations were not run during this import.",
+      "contentNote": "Product screenshots are still needed; repository icons are not used as screenshots."
+    }
+  },
+  {
+    "repository": "Sauti-tamu",
+    "private": false,
+    "revision": "4ab7da54de5c174f8f19cc82fc35c9e63a119ecc",
+    "evidence": [
+      "README.md",
+      "phone-app-frontend/package.json",
+      "phone-app-backend/package.json",
+      "phone-app-backend/src/routes/calls.js",
+      "phone-app-backend/src/services/callingService.js",
+      "phone-app-backend/src/services/callService.js"
+    ],
+    "review": [
+      "Repository README calls the application SmartConnect AI; confirm preferred portfolio name Sauti Tamu.",
+      "Supply authentic mobile screenshots.",
+      "Calling, SMS, and provider behavior were not tested; no cost-savings claims imported.",
+      "No live demo verified."
+    ],
+    "content": {
+      "title": "Sauti Tamu",
+      "slug": "sauti-tamu",
+      "order": 7,
+      "featured": false,
+      "published": false,
+      "summary": "A mobile calling project with contact management, call lifecycle handling, and real-time notifications.",
+      "description": [
+        "Sauti Tamu is a mobile communication project built around an Expo and React Native interface and a Node.js backend. The source includes contact management, phone-verification flows, incoming and active call screens, and call history.",
+        "The calling service coordinates call records, Agora room creation, recipient notifications, timeouts, and call state. It provides a concrete example of coordinating a mobile interface with several backend services, without claiming verified carrier connectivity, production readiness, or measured cost savings."
+      ],
+      "features": [
+        {
+          "title": "Mobile contacts and call screens",
+          "description": "Navigate contact lists, contact details, incoming calls, and active call views through Expo Router."
+        },
+        {
+          "title": "Call lifecycle coordination",
+          "description": "Create call records, prepare Agora rooms, check active-call state, and arrange call timeouts."
+        },
+        {
+          "title": "Notifications and history",
+          "description": "Coordinate WebSocket and push-notification paths and retain call history through backend services."
+        }
+      ],
+      "technologies": [
+        "TypeScript",
+        "JavaScript",
+        "React Native",
+        "Expo",
+        "Node.js",
+        "Express",
+        "PostgreSQL",
+        "MongoDB",
+        "Redis",
+        "Socket.IO",
+        "Agora",
+        "ClickHouse"
+      ],
+      "repositoryUrl": "https://github.com/StealthyScripter/Sauti-tamu",
+      "technicalDescription": [
+        "Expo Router organizes mobile screens and service clients communicate with Express routes. The calling service creates MongoDB call records, provisions Agora call rooms, caches state, and tries WebSocket notifications before push delivery.",
+        "The backend also includes PostgreSQL, Redis, and ClickHouse integrations. Their configuration and end-to-end behavior were not independently verified for this portfolio import."
+      ],
+      "currentStatus": "A calling application implementation with multiple external dependencies. Calling, phone verification, and deployment were not exercised during this import.",
+      "contentNote": "The repository README uses the name SmartConnect AI. Product screenshots and naming review are still needed."
+    }
+  }
+]

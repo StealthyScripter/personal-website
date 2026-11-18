@@ -3,6 +3,8 @@ import { randomBytes } from 'node:crypto';
 import { getConfig } from '../src/config.js';
 import { database, migrate } from '../src/db.js';
 import { seed } from '../src/seed.js';
+import { refinePortfolioCopy } from '../src/refine-copy.js';
+import { planProjectImport, applyProjectImport } from '../src/import-projects.js';
 import { manageAccount } from '../src/accounts.js';
 import { buildApp } from '../src/app.js';
 
@@ -15,6 +17,12 @@ const url = new URL(base.DATABASE_URL); url.pathname = `/${name}`;
 const config = { ...base, NODE_ENV: 'test' as const, DATABASE_URL: url.href, PORT: 4100, PUBLIC_ORIGIN: 'http://localhost:3100', ADMIN_ORIGIN: 'http://localhost:5183', API_ORIGIN: 'http://localhost:4100', MEDIA_DIR: `.local/${name}` };
 const db = database(config.DATABASE_URL);
 await migrate(db); await seed(db, config);
+await refinePortfolioCopy(db);
+if (process.env.PORTFOLIO_IMPORT_FIXTURE === '1') {
+  const input: unknown = JSON.parse(await fs.readFile('imports/github-projects.json', 'utf8'));
+  const existing = (await db.query("SELECT id,version,content FROM content_items WHERE kind='project' ORDER BY sort_order,created_at")).rows;
+  await applyProjectImport(db, planProjectImport(input, existing));
+}
 const email = 'browser@example.test', password = randomBytes(24).toString('base64url');
 await manageAccount(db, 'create', email, password);
 await fs.writeFile('.local/browser-session.json', JSON.stringify({ email, password, name }), { mode: 0o600 });
