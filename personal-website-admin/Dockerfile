@@ -16,6 +16,7 @@ RUN npm run build
 
 FROM caddy:2-alpine AS production
 COPY --from=build /app/dist /srv
-COPY Caddyfile /etc/caddy/Caddyfile
+# The deployment archive is extracted with a restrictive umask.
+COPY --chmod=0644 Caddyfile /etc/caddy/Caddyfile
 USER 1000:1000
 EXPOSE 8080

@@ -67,10 +67,11 @@ services:
     ports:
       - "127.0.0.1:8412:8080"
     healthcheck:
-      test: [CMD, wget, -q, -O, /dev/null, http://127.0.0.1:8080/]
+      test: [CMD, wget, -q, -O, /dev/null, http://127.0.0.1:8080/index.html]
+      start_period: 10s
       interval: 5s
-      timeout: 5s
-      retries: 20
+      timeout: 3s
+      retries: 5
     restart: always
 
 volumes:
