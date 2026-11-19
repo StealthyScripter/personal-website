@@ -7,9 +7,9 @@ The active environment has three independent applications:
 - `personal-website-backend/`: TypeScript/Fastify API with PostgreSQL and an
   existing local/S3-compatible media adapter.
 
-V1, V2 and V3 are historical applications. Their code and existing deployment
-workflow are unchanged. Docker Compose below is for **local development**, not
-a production deployment configuration.
+V1, V2 and V3 are historical applications. The commands below start the local
+development stack. The V4 production stack has a dedicated Compose file and
+[deployment guide](docker/PRODUCTION.md).
 
 ## Quick Start with Docker
 

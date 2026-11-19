@@ -12,8 +12,10 @@ EXPOSE 3000
 CMD ["npm", "run", "dev", "--", "--hostname", "0.0.0.0", "--webpack"]
 
 FROM development AS build
-ENV NODE_ENV=production NEXT_PUBLIC_API_URL=https://briankoringo.com SITE_URL=https://briankoringo.com
-RUN npm run build
+ARG NEXT_PUBLIC_API_URL
+ARG SITE_URL
+ENV NODE_ENV=production
+RUN test -n "$NEXT_PUBLIC_API_URL" && test -n "$SITE_URL" && npm run build
 
 FROM node:20.20.2-bookworm-slim AS production
 WORKDIR /app

@@ -1,12 +1,18 @@
+name: portfolio
+
+x-public-origin: &public-origin https://briankoringo.com
+x-admin-origin: &admin-origin https://admin.briankoringo.com
+
 services:
   postgres:
-    image: portfolio-postgres:18
+    image: postgres:18-bookworm
     environment:
       POSTGRES_USER: website
       POSTGRES_DB: personal_site
-      POSTGRES_PASSWORD: ${PORTFOLIO_DB_PASSWORD:?required}
+      POSTGRES_PASSWORD: ${PORTFOLIO_DB_PASSWORD:?Set PORTFOLIO_DB_PASSWORD in .env.production}
     volumes:
       - postgres_data:/var/lib/postgresql
+    networks: [database]
     healthcheck:
       test: [CMD-SHELL, 'pg_isready -h 127.0.0.1 -U "$${POSTGRES_USER}" -d "$${POSTGRES_DB}"']
       interval: 3s
@@ -15,25 +21,24 @@ services:
     restart: always
 
   backend:
-    image: portfolio-backend:${PORTFOLIO_COMMIT:?required}
+    image: portfolio-backend:production
+    build:
+      context: ./personal-website-backend
+      target: production
+    env_file: ./docker/production.backend.env
     environment:
-      NODE_ENV: production
-      DATABASE_URL: postgresql://website:${PORTFOLIO_DB_PASSWORD:?required}@postgres:5432/personal_site
-      SECURITY_SECRET: ${PORTFOLIO_SECURITY_SECRET:?required}
-      HOST: 0.0.0.0
-      PORT: "4000"
-      PUBLIC_ORIGIN: https://briankoringo.com
-      ADMIN_ORIGIN: https://admin.briankoringo.com
-      API_ORIGIN: https://admin.briankoringo.com
-      # Host Caddy reaches the loopback-published port through the release bridge gateway.
-      TRUST_PROXY: docker-gateway
-      STORAGE_DRIVER: local
-      MEDIA_DIR: /app/media
+      DATABASE_URL: postgresql://website:${PORTFOLIO_DB_PASSWORD:?Set PORTFOLIO_DB_PASSWORD in .env.production}@postgres:5432/personal_site
+      SECURITY_SECRET: ${PORTFOLIO_SECURITY_SECRET:?Set PORTFOLIO_SECURITY_SECRET in .env.production}
+      PUBLIC_ORIGIN: *public-origin
+      ADMIN_ORIGIN: *admin-origin
+      API_ORIGIN: *admin-origin
+    command: [sh, -ec, 'node dist/cli.js migrate && node dist/cli.js seed --if-uninitialized && exec node dist/server.js']
     depends_on:
       postgres:
         condition: service_healthy
     volumes:
       - media_data:/app/media
+    networks: [app, database]
     ports:
       - "127.0.0.1:8410:4000"
     healthcheck:
@@ -45,15 +50,22 @@ services:
     restart: always
 
   v4:
-    image: portfolio-v4:${PORTFOLIO_COMMIT:?required}
+    image: portfolio-v4:production
+    build:
+      context: ./personal-website-v4
+      target: production
+      args:
+        NEXT_PUBLIC_API_URL: *public-origin
+        SITE_URL: *public-origin
     environment:
       BACKEND_URL: http://backend:4000
-      SITE_URL: https://briankoringo.com
+      SITE_URL: *public-origin
     depends_on:
       backend:
         condition: service_healthy
     ports:
       - "127.0.0.1:8411:3000"
+    networks: [app]
     healthcheck:
       test: [CMD, node, -e, "fetch('http://127.0.0.1:3000/',{signal:AbortSignal.timeout(8000)}).then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
       interval: 5s
@@ -63,9 +75,15 @@ services:
     restart: always
 
   admin:
-    image: portfolio-admin:${PORTFOLIO_COMMIT:?required}
+    image: portfolio-admin:production
+    build:
+      context: ./personal-website-admin
+      target: production
+      args:
+        VITE_API_URL: *admin-origin
     ports:
       - "127.0.0.1:8412:8080"
+    networks: [app]
     healthcheck:
       test: [CMD, wget, -q, -O, /dev/null, http://127.0.0.1:8080/index.html]
       start_period: 10s
@@ -74,10 +92,15 @@ services:
       retries: 5
     restart: always
 
+networks:
+  app:
+  database:
+    internal: true
+
 volumes:
   postgres_data:
-    external: true
-    name: ${PORTFOLIO_PROJECT:?required}_postgres_data
+    external: ${PORTFOLIO_EXTERNAL_VOLUMES:-false}
+    name: ${PORTFOLIO_POSTGRES_VOLUME:-portfolio_postgres_data}
   media_data:
-    external: true
-    name: ${PORTFOLIO_PROJECT:?required}_media_data
+    external: ${PORTFOLIO_EXTERNAL_VOLUMES:-false}
+    name: ${PORTFOLIO_MEDIA_VOLUME:-portfolio_media_data}

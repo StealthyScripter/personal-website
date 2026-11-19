@@ -11,8 +11,9 @@ EXPOSE 5173
 CMD ["node", "node_modules/vite/bin/vite.js", "--config", "vite.docker.config.mjs", "--host", "0.0.0.0", "--port", "5173", "--strictPort"]
 
 FROM development AS build
-ENV NODE_ENV=production VITE_API_URL=https://admin.briankoringo.com
-RUN npm run build
+ARG VITE_API_URL
+ENV NODE_ENV=production
+RUN test -n "$VITE_API_URL" && npm run build
 
 FROM caddy:2-alpine AS production
 COPY --from=build /app/dist /srv

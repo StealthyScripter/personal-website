@@ -30,7 +30,15 @@ const db = database(config.DATABASE_URL);
 try {
   const [, , command, action, email] = process.argv;
   if (command === 'migrate') { await migrate(db); console.log('Migrations applied.'); }
-  else if (command === 'seed') { await seed(db, config); console.log('Seed imported without overwriting existing content.'); }
+  else if (command === 'seed') {
+    // The seed writes the settings row last, so an interrupted first seed can resume.
+    if (action === '--if-uninitialized' && (await db.query('SELECT 1 FROM site_settings WHERE id=1')).rowCount) {
+      console.log('Site settings already exist. Skipping initial seed.');
+    } else {
+      await seed(db, config);
+      console.log('Seed imported without overwriting existing content.');
+    }
+  }
   else if (command === 'refine-copy') { await refinePortfolioCopy(db); console.log('Portfolio copy updated in editable site settings.'); }
   else if (command === 'admin') console.log(await manageAccount(db, action, email, ['create', 'password'].includes(action) ? await readPassword() : undefined));
   else if (command === 'prune') { await db.query('DELETE FROM admin_sessions WHERE expires_at<now()'); await db.query('DELETE FROM rate_limits WHERE expires_at<now()'); console.log('Expired sessions and rate limits removed.'); }
