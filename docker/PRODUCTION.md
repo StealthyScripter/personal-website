@@ -4,6 +4,9 @@ The production stack serves V4 at `https://briankoringo.com`, the admin UI at
 `https://admin.briankoringo.com`, and selected API routes on those same origins.
 Caddy terminates TLS. The three app ports bind to VPS loopback. PostgreSQL has
 no published port. The development Compose file remains separate from production.
+The backend resolves `TRUST_PROXY=docker-gateway` to its release network's IPv4
+default gateway, which is the peer address for host Caddy's loopback connection.
+Keep the backend port bound to loopback and let Caddy set the forwarded headers.
 
 ## One-time host setup
 

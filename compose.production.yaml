@@ -25,7 +25,8 @@ services:
       PUBLIC_ORIGIN: https://briankoringo.com
       ADMIN_ORIGIN: https://admin.briankoringo.com
       API_ORIGIN: https://admin.briankoringo.com
-      TRUST_PROXY: "1"
+      # Host Caddy reaches the loopback-published port through the release bridge gateway.
+      TRUST_PROXY: docker-gateway
       STORAGE_DRIVER: local
       MEDIA_DIR: /app/media
     depends_on:

@@ -38,6 +38,39 @@ test('real PostgreSQL API, CLI, security and content workflows', { timeout: 1200
       assert.equal((await app.inject('/api/projects')).json().items.length, 3);
       assert.equal((await app.inject('/api/notes')).json().items.length, 0);
     });
+    await t.test('only the configured proxy can supply forwarded connection details', async () => {
+      const proxy = '172.30.84.1';
+      const directClient = '172.30.84.12';
+      const proxyApp = await buildApp({ ...config, TRUST_PROXY: proxy }, db);
+      proxyApp.get('/connection', async (request) => ({
+        ip: request.ip, host: request.host, protocol: request.protocol,
+      }));
+      const headers = {
+        host: 'backend:4000',
+        'x-forwarded-for': '192.0.2.99, 198.51.100.10',
+        'x-forwarded-host': 'admin.example.test',
+        'x-forwarded-proto': 'https',
+      };
+      try {
+        const direct = await proxyApp.inject({ url: '/connection', remoteAddress: directClient, headers });
+        assert.deepEqual(direct.json(), { ip: directClient, host: headers.host, protocol: 'http' });
+        const forwarded = await proxyApp.inject({ url: '/connection', remoteAddress: proxy, headers });
+        assert.deepEqual(forwarded.json(), { ip: '198.51.100.10', host: 'admin.example.test', protocol: 'https' });
+
+        for (let attempt = 1; attempt <= 11; attempt++) {
+          const response = await proxyApp.inject({
+            method: 'POST',
+            url: '/api/admin/auth/login',
+            remoteAddress: directClient,
+            headers: { ...headers, origin: config.ADMIN_ORIGIN, 'x-forwarded-for': `192.0.2.${attempt}` },
+            payload: {},
+          });
+          assert.equal(response.statusCode, attempt <= 10 ? 401 : 429);
+        }
+      } finally {
+        await proxyApp.close();
+      }
+    });
     await t.test('editorial update preserves identity, content and subsequent admin editability', async () => {
       const before = (await db.query('SELECT content,version FROM site_settings WHERE id=1')).rows[0];
       await refinePortfolioCopy(db);
