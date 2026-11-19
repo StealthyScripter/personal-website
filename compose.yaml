@@ -58,7 +58,9 @@ services:
     restart: unless-stopped
 
   setup:
-    build: ./personal-website-backend
+    build:
+      context: ./personal-website-backend
+      target: development
     environment: *backend-environment
     command: [node, --import, tsx, docker/bootstrap.mjs]
     depends_on:
@@ -75,7 +77,9 @@ services:
     init: true
 
   backend:
-    build: ./personal-website-backend
+    build:
+      context: ./personal-website-backend
+      target: development
     environment:
       <<: *backend-environment
       CHOKIDAR_USEPOLLING: "true"
@@ -105,7 +109,9 @@ services:
     init: true
 
   v4:
-    build: ./personal-website-v4
+    build:
+      context: ./personal-website-v4
+      target: development
     environment:
       NODE_ENV: development
       BACKEND_URL: http://backend:4000
@@ -131,7 +137,9 @@ services:
     init: true
 
   admin:
-    build: ./personal-website-admin
+    build:
+      context: ./personal-website-admin
+      target: development
     environment:
       NODE_ENV: development
       VITE_API_URL: http://localhost:4000

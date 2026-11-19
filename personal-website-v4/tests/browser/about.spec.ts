@@ -5,7 +5,7 @@ for (const width of [375, 1440]) {
     test(`biography expands with keyboard at ${width}px in ${theme} theme`, async ({ page, request }) => {
       const errors: string[] = [];
       page.on('pageerror', (error) => errors.push(error.message));
-      const response = await request.get('http://localhost:4000/api/settings');
+      const response = await request.get(`${process.env.PLAYWRIGHT_API_URL || 'http://localhost:4000'}/api/settings`);
       expect(response.ok()).toBe(true);
       const { about: paragraphs } = await response.json() as { about: string[] };
       expect(paragraphs).toHaveLength(5);

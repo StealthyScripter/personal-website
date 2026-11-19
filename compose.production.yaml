@@ -1,0 +1,81 @@
+services:
+  postgres:
+    image: portfolio-postgres:18
+    environment:
+      POSTGRES_USER: website
+      POSTGRES_DB: personal_site
+      POSTGRES_PASSWORD: ${PORTFOLIO_DB_PASSWORD:?required}
+    volumes:
+      - postgres_data:/var/lib/postgresql
+    healthcheck:
+      test: [CMD-SHELL, 'pg_isready -h 127.0.0.1 -U "$${POSTGRES_USER}" -d "$${POSTGRES_DB}"']
+      interval: 3s
+      timeout: 5s
+      retries: 30
+    restart: always
+
+  backend:
+    image: portfolio-backend:${PORTFOLIO_COMMIT:?required}
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://website:${PORTFOLIO_DB_PASSWORD:?required}@postgres:5432/personal_site
+      SECURITY_SECRET: ${PORTFOLIO_SECURITY_SECRET:?required}
+      HOST: 0.0.0.0
+      PORT: "4000"
+      PUBLIC_ORIGIN: https://briankoringo.com
+      ADMIN_ORIGIN: https://admin.briankoringo.com
+      API_ORIGIN: https://admin.briankoringo.com
+      TRUST_PROXY: "1"
+      STORAGE_DRIVER: local
+      MEDIA_DIR: /app/media
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - media_data:/app/media
+    ports:
+      - "127.0.0.1:8410:4000"
+    healthcheck:
+      test: [CMD, node, -e, "fetch('http://127.0.0.1:4000/health',{signal:AbortSignal.timeout(4000)}).then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    init: true
+    restart: always
+
+  v4:
+    image: portfolio-v4:${PORTFOLIO_COMMIT:?required}
+    environment:
+      BACKEND_URL: http://backend:4000
+      SITE_URL: https://briankoringo.com
+    depends_on:
+      backend:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:8411:3000"
+    healthcheck:
+      test: [CMD, node, -e, "fetch('http://127.0.0.1:3000/',{signal:AbortSignal.timeout(8000)}).then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 5s
+      timeout: 10s
+      retries: 20
+    init: true
+    restart: always
+
+  admin:
+    image: portfolio-admin:${PORTFOLIO_COMMIT:?required}
+    ports:
+      - "127.0.0.1:8412:8080"
+    healthcheck:
+      test: [CMD, wget, -q, -O, /dev/null, http://127.0.0.1:8080/]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    restart: always
+
+volumes:
+  postgres_data:
+    external: true
+    name: ${PORTFOLIO_PROJECT:?required}_postgres_data
+  media_data:
+    external: true
+    name: ${PORTFOLIO_PROJECT:?required}_media_data

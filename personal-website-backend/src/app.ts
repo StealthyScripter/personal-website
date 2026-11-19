@@ -19,7 +19,8 @@ const writeBody = z.strictObject({ content: z.unknown(), version: z.number().int
 const paging = z.object({ limit: z.coerce.number().int().min(1).max(100).default(50), offset: z.coerce.number().int().min(0).max(100000).default(0) });
 
 export async function buildApp(config: Config, db: Database, storage: Storage = storageFor(config)) {
-  const app = Fastify({ bodyLimit: 256 * 1024, trustProxy: config.TRUST_PROXY ? config.TRUST_PROXY.split(',') : false,
+  const trustProxy = config.TRUST_PROXY === '1' ? 1 : config.TRUST_PROXY ? config.TRUST_PROXY.split(',') : false;
+  const app = Fastify({ bodyLimit: 256 * 1024, trustProxy,
     logger: config.NODE_ENV === 'test' ? false : { level: 'info', redact: ['req.headers.cookie', 'req.headers.authorization', 'req.headers["x-csrf-token"]', 'res.headers["set-cookie"]'] } });
   await app.register(cookie);
   await app.register(cors, { origin: [config.PUBLIC_ORIGIN, config.ADMIN_ORIGIN], credentials: true, methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'], allowedHeaders: ['Content-Type', 'X-CSRF-Token'] });

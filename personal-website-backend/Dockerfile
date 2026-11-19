@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1
-FROM node:20.20.2-bookworm-slim
+FROM node:20.20.2-bookworm-slim AS development
 WORKDIR /app
 RUN chown node:node /app
 USER node
@@ -13,3 +13,8 @@ RUN mkdir -p /app/.docker-verification
 ENV NODE_ENV=development HOST=0.0.0.0 CHOKIDAR_USEPOLLING=true CHOKIDAR_INTERVAL=1000
 EXPOSE 4000
 CMD ["npm", "run", "dev"]
+
+FROM development AS production
+ENV NODE_ENV=production
+RUN npm run build && mkdir -p /app/media
+CMD ["node", "dist/server.js"]

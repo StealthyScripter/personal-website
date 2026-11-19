@@ -1,0 +1,30 @@
+briankoringo.com {
+	encode zstd gzip
+	@api path /api/settings /api/projects /api/projects/* /api/notes /api/notes/* /api/currently /api/messages /api/media/*
+	handle @api {
+		reverse_proxy 127.0.0.1:8410
+	}
+	handle /api/* {
+		respond 404
+	}
+	handle {
+		reverse_proxy 127.0.0.1:8411
+	}
+}
+
+admin.briankoringo.com {
+	encode zstd gzip
+	header X-Robots-Tag "noindex, nofollow"
+	header X-Frame-Options DENY
+	header X-Content-Type-Options nosniff
+	@api path /api/admin /api/admin/* /api/media/*
+	handle @api {
+		reverse_proxy 127.0.0.1:8410
+	}
+	handle /api/* {
+		respond 404
+	}
+	handle {
+		reverse_proxy 127.0.0.1:8412
+	}
+}

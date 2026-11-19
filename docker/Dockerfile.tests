@@ -1,0 +1,18 @@
+# syntax=docker/dockerfile:1
+FROM node:20.20.2-bookworm-slim
+WORKDIR /suite
+COPY personal-website-backend/package*.json ./personal-website-backend/
+COPY personal-website-v4/package*.json ./personal-website-v4/
+COPY personal-website-admin/package*.json ./personal-website-admin/
+RUN set -eu; for app in personal-website-backend personal-website-v4 personal-website-admin; do \
+      (cd "$app" && npm ci --ignore-scripts && npm rebuild esbuild); \
+    done
+ENV PLAYWRIGHT_BROWSERS_PATH=/ms-playwright NEXT_TELEMETRY_DISABLED=1
+RUN cd personal-website-admin && npx --no-install playwright install --with-deps chromium
+COPY personal-website-backend ./personal-website-backend
+COPY personal-website-v4 ./personal-website-v4
+COPY personal-website-admin ./personal-website-admin
+COPY scripts/test-portfolio.sh ./scripts/
+RUN chown -R node:node /suite
+USER node
+CMD ["bash", "scripts/test-portfolio.sh"]
